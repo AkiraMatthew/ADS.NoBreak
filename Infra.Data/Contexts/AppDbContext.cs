@@ -4,15 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Data.Contexts;
 
-public class LoginContext: IdentityDbContext<UserData>
+public class AppDbContext: IdentityDbContext<UserData>
 {
-    public LoginContext(DbContextOptions<LoginContext> options) : base(options) { }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<UserData>().Property(u => u.UserName).HasMaxLength(12);
+        builder.Entity<UserData>().Property(u => u.Email);
 
         builder.HasDefaultSchema("identity");
     }

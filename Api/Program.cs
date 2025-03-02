@@ -50,10 +50,10 @@ builder.Services.AddIdentityCore<UserData>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
 })
-    .AddEntityFrameworkStores<LoginContext>()
+    .AddEntityFrameworkStores<AppDbContext>()
     .AddApiEndpoints();
 
-builder.Services.AddDbContext<LoginContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("ApiConnection")
 ));
 
@@ -64,7 +64,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Akira Digital Solutions - Card�pio Delivery API",
+        Title = "Akira Digital Solutions - PassAuth API",
         Version = "v1",
         Description = "This API is about a Delivery Menu registration made by the contracting part. The Contracting Part could be a Restaurant or even a small food delivery.",
         Contact = new OpenApiContact
@@ -75,16 +75,14 @@ builder.Services.AddSwaggerGen(options =>
         },
         License = new OpenApiLicense
         {
-            Name = "MIT",
-            Url = new Uri("https://opensource.org/licenses/MIT")
+            Name = "Copyright 2025 Akira Digital Solutions",
+            Url = new Uri("https://github.com/AkiraMatthew/ADS.PassAuthKeeper?tab=License-1-ov-file")
         }
     });
 });
 #endregion
 
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
