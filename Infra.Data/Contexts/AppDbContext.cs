@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Data.Contexts;
 
-public class AppDbContext: IdentityDbContext<UserData>
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<UserData>(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

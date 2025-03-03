@@ -1,72 +1,38 @@
-using Domain.Entities;
 using Infra.CrossCutting.IoC;
-using Infra.Data.Contexts;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.OpenApi.Models;
+using Infra.CrossCutting.IoC.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
+var apiVersion = builder.Configuration.GetValue<string>("ApiVersion");
 
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDataProtection();
-#region Versioning
-/*builder.Services.AddApiVersioning(
-                options =>
-                {
-                    options.DefaultApiVersion = new ApiVersion(1);
-                    options.AssumeDefaultVersionWhenUnspecified = true;
-                    // reporting api versions will return the headers
-                    // "api-supported-versions" and "api-deprecated-versions"
-                    options.ReportApiVersions = true;
-                    options.ApiVersionReader = ApiVersionReader.Combine(
-                           new UrlSegmentApiVersionReader(),
-                           new QueryStringApiVersionReader("api-version"),
-                           new HeaderApiVersionReader("1-Version"),
-                           new MediaTypeApiVersionReader("1-version"));
-                })
-            .AddMvc(
-                options =>
-                {
-                    // automatically applies an api version based on the name of
-                    // the defining controller's namespace
-                    options.Conventions.Add(new VersionByNamespaceConvention());
-                });
-
-builder.Services.AddDbContext<LoginContext>(options =>
-    options.UseSqlServer("ADS-Delivery")
-);*/
-#endregion
-
-#region IdentityConfig
-// Add Identity services with default UI
-builder.Services.AddIdentityCore<UserData>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = true;
-})
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddApiEndpoints();
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("ApiConnection")
-));
-
-#endregion
+builder.Services.AddIdentityConfiguration(builder.Configuration);
+builder.Services.AddAppDbConnections(builder.Configuration);
+builder.Services.AddAppDependencyInjection(builder.Configuration);
+builder.Services.AddAutoMapper(typeof(Program));
 
 #region Swagger Documentation
 builder.Services.AddSwaggerGen(options =>
 {
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description =
+                    "This is a system built for encrypt/decrypt passwords and files, generate passwords, store passwords/sensitive data\r\n\r\n" +
+                    "Type 'Bearer' + your token in the input below, ex.: 'Bearer XYZ'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+    });
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Akira Digital Solutions - PassAuth API",
+        Title = "Akira Digital Solutions - PassAuthKeeper API",
         Version = "v1",
-        Description = "This API is about a Delivery Menu registration made by the contracting part. The Contracting Part could be a Restaurant or even a small food delivery.",
+        Description = "This is a system built for encrypt/decrypt passwords and files, generate passwords, store passwords/sensitive data.",
         Contact = new OpenApiContact
         {
             Name = "Mateus Henrique",
@@ -97,17 +63,10 @@ if (app.Environment.IsDevelopment())
     });
     app.RunMigrations();
 }
-/*
-app.MapGet("users/me", async (ClaimsPrincipal claims, LoginContext context) =>
-{
-    string userId = claims.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
-    return await context.Users.FindAsync(userId);
-})
-.RequireAuthorization();*/
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseAuthentication();
 app.MapControllers();
-//app.MapIdentityApi<IdentityUser>();
+app.UseRouting();
 app.Run();
