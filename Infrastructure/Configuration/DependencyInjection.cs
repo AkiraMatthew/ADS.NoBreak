@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infra.CrossCutting.IoC.Configuration;
+namespace Infrastructure.Configuration;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddAppDependencyInjection(this IServiceCollection services, IConfiguration configuration) 
+    public static IServiceCollection AddAppDependencyInjection(this IServiceCollection services, IConfiguration configuration)
     {
         AddRepositoriesDependencyInjection(services);
         AddServicesDependencyInjection(services);

@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog.Context;
 
-namespace Infra.CrossCutting.IoC;
+namespace Infrastructure.Configuration;
 
 public static class MigrationConfig
 {

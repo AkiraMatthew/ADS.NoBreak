@@ -1,6 +1,5 @@
-using Infra.CrossCutting.IoC;
 using Microsoft.OpenApi.Models;
-using Infra.CrossCutting.IoC.Configuration;
+using Infrastructure.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 var apiVersion = builder.Configuration.GetValue<string>("ApiVersion");
@@ -28,10 +27,10 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
     });
-    options.SwaggerDoc("v1", new OpenApiInfo
+    options.SwaggerDoc(apiVersion, new OpenApiInfo
     {
         Title = "Akira Digital Solutions - PassAuthKeeper API",
-        Version = "v1",
+        Version = apiVersion,
         Description = "This is a system built for encrypt/decrypt passwords and files, generate passwords, store passwords/sensitive data.",
         Contact = new OpenApiContact
         {
@@ -57,14 +56,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint($"/swagger/v1/swagger.json", "ADS.PassAuthKeeper");
+        options.SwaggerEndpoint($"/swagger/{apiVersion}/swagger.json", "ADS.PassAuthKeeper");
         options.DocumentTitle = "PassAuthKeeper API Documentation";
         options.RoutePrefix = string.Empty;
     });
-    app.RunMigrations();
 }
 
 app.UseHttpsRedirection();
+app.RunMigrations();
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapControllers();

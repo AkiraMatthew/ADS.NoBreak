@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infra.CrossCutting.IoC.Configuration;
+namespace Infrastructure.Configuration;
 
 public static class DbConnection
 {

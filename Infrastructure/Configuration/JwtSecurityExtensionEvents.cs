@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Logging;
 
-namespace Infra.CrossCutting.IoC.Configuration;
+namespace Infrastructure.Configuration;
 public sealed class JwtSecurityExtensionEvents : JwtBearerEvents
 {
     private readonly ILogger<JwtSecurityExtensionEvents> _logger;
