@@ -10,8 +10,8 @@ public static class DbConnection
 {
     public static IServiceCollection AddAppDbConnections(this IServiceCollection services, IConfiguration configuration)
     {
-        var apiConnection = configuration.GetConnectionString("ApiConnection");
-        services.AddDbContext<AppDbContext>(options => options.UseSqlServer(apiConnection,
+        var connectionString = configuration.GetConnectionString("connectionString");
+        services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString,
             providerOptions =>
             {
                 providerOptions.CommandTimeout(200);

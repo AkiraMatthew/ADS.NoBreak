@@ -26,8 +26,8 @@ public static class IdentityConfig
             options.Password.RequireDigit = false;
             options.Password.RequireUppercase = false;
             options.Password.RequireLowercase = false;
-            options.Password.RequiredLength = 3;
-            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Password.RequiredLength = 2;
+            options.Lockout.MaxFailedAccessAttempts = 6;
         })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();

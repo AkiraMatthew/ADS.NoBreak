@@ -1,5 +1,5 @@
-using Microsoft.OpenApi.Models;
 using Infrastructure.Configuration;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var apiVersion = builder.Configuration.GetValue<string>("ApiVersion");
@@ -50,20 +50,18 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint($"/swagger/{apiVersion}/swagger.json", "ADS.PassAuthKeeper");
-        options.DocumentTitle = "PassAuthKeeper API Documentation";
-        options.RoutePrefix = string.Empty;
-    });
-}
+    options.SwaggerEndpoint($"/swagger/{apiVersion}/swagger.json", "ADS.PassAuthKeeper");
+    options.DocumentTitle = "PassAuthKeeper API Documentation";
+    options.RoutePrefix = string.Empty;
+});
 
 app.UseHttpsRedirection();
-app.RunMigrations();
+//app.RunMigrations();
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapControllers();
