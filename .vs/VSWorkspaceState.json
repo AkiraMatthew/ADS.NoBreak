@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Backend",
+    "\\Backend\\BE-Authentication",
+    "\\Backend\\BE-Authentication\\Infrastructure",
+    "\\Backend\\BE-Authentication\\Infrastructure\\Configuration"
+  ],
+  "SelectedNode": "\\Backend\\BE-Authentication\\Authentication.sln",
+  "PreviewInSolutionExplorer": false
+}
