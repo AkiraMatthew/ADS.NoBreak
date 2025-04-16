@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Data.Contexts;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<UserData>(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
-
+    public DbSet<RefreshToken> RefreshToken { get; set; }
 }
