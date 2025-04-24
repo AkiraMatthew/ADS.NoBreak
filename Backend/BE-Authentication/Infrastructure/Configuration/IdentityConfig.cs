@@ -40,12 +40,20 @@ public static class IdentityConfig
 
     private static void TokenSettings(IServiceCollection services, IConfiguration configuration)
     {
-        var jwtSettings = configuration.GetSection(JWT_CONFIG).Get<JwtSettings>() ?? throw new ArgumentNullException(nameof(configuration), "JWT settings cannot be null");
+        var jwtSettingsSection = configuration.GetSection(JWT_CONFIG);
+        var jwtSettings = jwtSettingsSection.Get<JwtSettings>() ?? throw new ArgumentNullException(nameof(configuration), "JWT settings cannot be null");
         services.AddSingleton(jwtSettings);
     }
 
     public static IServiceCollection AddJwtSecurity(this IServiceCollection services, IConfiguration configuration)
     {
+        var jwtSettingsSection = configuration.GetSection(JWT_CONFIG);
+        var key = Encoding.UTF8.GetBytes(
+            configuration["JwtBearerTokenSettings:SecretKey"]
+            ?? throw new ArgumentNullException(
+                nameof(configuration), 
+                "JwtBearerTokenSettings:SecretKey is null"));
+
         services.AddAuthentication(opt =>
         {
             opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -55,6 +63,7 @@ public static class IdentityConfig
         .AddJwtBearer(opt =>
         {
             opt.RequireHttpsMetadata = true;
+            opt.SaveToken = true;
             opt.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = true,
@@ -64,8 +73,7 @@ public static class IdentityConfig
                 ValidIssuer = configuration["JwtBearerTokenSettings:Issuer"],
 
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration["JwtBearerTokenSettings:SecretKey"] ?? throw new ArgumentNullException(nameof(configuration), "JwtBearerTokenSettings:SecretKey is null"))),
+                IssuerSigningKey = new SymmetricSecurityKey(key),
 
                 ValidateLifetime = true,
                 RequireExpirationTime = true,
