@@ -19,7 +19,7 @@ This module is the centralized Backend module built in a Monolithic Layered Arch
 ## Environment Setup
 1. Clone this repository.
 2. Open the project in Visual Studio or Visual Studio Code.
-3. Ensure that the [.NET 6.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is installed.
+3. Ensure that the [.NET 9.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) is installed.
 4. Run the command `dotnet restore` to restore the project dependencies.
 
 ## Libraries and Frameworks
