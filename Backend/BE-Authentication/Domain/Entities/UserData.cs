@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities;
 
-public class UserData : IdentityUser
+public class User : IdentityUser
 {
-
+    public override string? PasswordHash { get; set; }
 }
