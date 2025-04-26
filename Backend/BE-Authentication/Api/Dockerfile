@@ -10,7 +10,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Authentication.Api/Authentication.Api.csproj", "Authentication.Api/"]
 COPY ["Authentication.Domain/Authentication.Domain.csproj", "Authentication.Domain/"]
-COPY ["Authentication.Infra.CrossCutting.IoC/Authentication.Infra.CrossCutting.IoC.csproj", "Authentication.Infra.CrossCutting.IoC/"]
+COPY ["Authentication.Infrastructure/Authentication.Infrastructure.csproj", "Authentication.Infrastructure/"]
 COPY ["Authentication.Infra.Data/Authentication.Infra.Data.csproj", "Authentication.Infra.Data/"]
 COPY ["Authentication.Services/Authentication.Services.csproj", "Authentication.Services/"]
 COPY ["Authentication.UnitTests/Authentication.UnitTests.csproj", "Authentication.UnitTests/"]
