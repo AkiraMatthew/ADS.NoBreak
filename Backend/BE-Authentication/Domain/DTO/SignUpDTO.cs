@@ -14,4 +14,5 @@ public class SignUpDTO
 
     [Required, Compare("Password", ErrorMessage = "The passwords must be the same")]
     public string ConfirmPassword { get; set; } = null!;
+    public string? Country { get; set; }
 }
