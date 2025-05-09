@@ -1,0 +1,54 @@
+name: Build application
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-backend:
+    name: Build .NET Backend
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Restore dependencies
+      working-directory: ./Backend/BE-Authentication
+      run: dotnet restore
+    
+    - name: Build
+      working-directory: ./Backend/BE-Authentication/Api/Api.csproj
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Test
+      working-directory: ./Backend/BE-Authentication/UnitTests
+      run: dotnet test --no-restore --verbosity normal
+
+  build-frontend:
+    name: Build Expo Frontend
+    runs-on: ubuntu-latest
+    needs: build-backend
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22.x'
+    
+    - name: Install Expo CLI
+      run: npm install -g expo-cli
+    
+    - name: Install dependencies
+      working-directory: ./Frontend/FE-NoBreak-app
+      run: npm install
+    
+    - name: Build
+      working-directory: ./Frontend/FE-NoBreak-app
+      run: expo build:web
