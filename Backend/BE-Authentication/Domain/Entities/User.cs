@@ -6,4 +6,5 @@ public class User : IdentityUser
 {
     public override string? PasswordHash { get; set; }
     public string? UserCountry{ get; set; }
+    public string? FullName { get; set; }
 }

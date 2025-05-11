@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Interfaces.Services;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -10,55 +11,27 @@ using System.Text;
 
 namespace Services.Services;
 
-internal sealed class AuthService (JwtSettings jwtSettings,
-        UserManager<User> userManager, ILogger<AuthService> logger, RoleManager<IdentityRole> roleManager): IAuthService
+public class AuthService (
+    JwtSettings jwtSettings,
+    UserManager<User> userManager,
+    ILogger<AuthService> logger, 
+    IClaimsService claimsService
+    )
+    : IAuthService
 {
+    private const string ACCESS_TOKEN_TYPE = "at+jwt";
+
     public async Task<Token> GenerateTokenAsync(string username)
     {
         logger.LogInformation($"Generating token...");
 
         try
         {
-            var user = await GetUser(username);
-            var handler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
 
-            var userClaims = await GetUserClaims(user);
-            var roles = await userManager.GetRolesAsync(user);
-            var roleClaims = await GetRoleClaims(roles);
-
-            var claims = new List<Claim>();
-            string? userDataValue = null;
-
-            foreach (var userClaim in userClaims)
-            {
-                if (userClaim.Type == ClaimTypes.UserData)
-                {
-                    userDataValue = userClaim.Value;
-                }
-                else
-                {
-                    claims.Add(new Claim("userClaims", $"{userClaim.Type}:{userClaim.Value}"));
-                }
-            }
-
-            foreach (var roleClaim in roleClaims)
-            {
-                claims.Add(new Claim("roleClaims", $"{roleClaim.Type}:{roleClaim.Value}"));
-            }
-
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            if (!string.IsNullOrEmpty(userDataValue))
-            {
-                claims.Add(new Claim(ClaimTypes.UserData, userDataValue));
-            }
-
-            claims.Add(new Claim("fullName", user.NomeCompleto ?? string.Empty));
-            claims.Add(new Claim("userName", user.UserName ?? string.Empty));
+            var user = await GetUserDataAsync(username);
+            var claims = await claimsService.GetClaimsForUserAsync(user);
 
             var identityClaims = new ClaimsIdentity();
             identityClaims.AddClaims(claims);
@@ -75,22 +48,28 @@ internal sealed class AuthService (JwtSettings jwtSettings,
                 Subject = identityClaims
             };
 
-            var securityToken = handler.CreateToken(securityTokenDescriptor);
-            var encodedJwt = handler.WriteToken(securityToken);
-            var refreshToken = await GenerateRefreshToken(user);
+            var securityToken = tokenHandler.CreateToken(securityTokenDescriptor);
+            var encodedJwt = tokenHandler.WriteToken(securityToken);
+            //var refreshToken = await GenerateRefreshToken(user);
 
             logger.LogInformation($"Token generation success!");
 
             return new Token
             {
                 AccessToken = encodedJwt,
-                RefreshToken = refreshToken
+                //RefreshToken = refreshToken
             };
         }
-        catch (BusinessException ex)
+        catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while generating the token for user: {Username}", username);
-            throw new BusinessException($"An error occurred while generating the token for user: {username}", ex);
+            throw new Exception($"An error occurred while generating the token for user: {username}", ex);
         }
+    }
+
+    private async Task<User> GetUserDataAsync(string username)
+    {
+        var userData = await userManager.FindByNameAsync(username);
+        return userData ?? throw new Exception("User not found");
     }
 }
