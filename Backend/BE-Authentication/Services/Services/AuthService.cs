@@ -2,19 +2,19 @@
 using Domain.Interfaces.Services;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Services.Settings;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Serilog;
 
 namespace Services.Services;
 
 public class AuthService (
     JwtSettings jwtSettings,
     UserManager<User> userManager,
-    ILogger<AuthService> logger, 
+    ILogger logger, 
     IClaimsService claimsService
     )
     : IAuthService
@@ -23,7 +23,7 @@ public class AuthService (
 
     public async Task<Token> GenerateTokenAsync(string username)
     {
-        logger.LogInformation($"Generating token...");
+        logger.Information($"Generating token...");
 
         try
         {
@@ -52,7 +52,7 @@ public class AuthService (
             var encodedJwt = tokenHandler.WriteToken(securityToken);
             //var refreshToken = await GenerateRefreshToken(user);
 
-            logger.LogInformation($"Token generation success!");
+            logger.Information($"Token generation success!");
 
             return new Token
             {
@@ -62,7 +62,7 @@ public class AuthService (
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while generating the token for user: {Username}", username);
+            logger.Error(ex, "An error occurred while generating the token for user: {Username}", username);
             throw new Exception($"An error occurred while generating the token for user: {username}", ex);
         }
     }

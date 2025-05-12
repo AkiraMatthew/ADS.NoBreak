@@ -6,7 +6,7 @@ using Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Net;
 using System.Text;
 
@@ -35,7 +35,7 @@ public class UserService(
             var isAValidPwd = await userManager.CheckPasswordAsync(user, password);
             if (!isAValidPwd)
             {
-                logger.LogInformation("Invalid password for user {UserName}", credentials.UserName);
+                logger.Information("Invalid password for user {UserName}", credentials.UserName);
 
                 await userManager.AccessFailedAsync(user);
                 throw new Exception("Invalid password!");
@@ -53,20 +53,20 @@ public class UserService(
 
             InsertTokenIntoCookies(user.Id, token);
 
-            logger.LogInformation("Signing successful for user {UserName}", credentials.UserName);
+            logger.Information("Signing successful for user {UserName}", credentials.UserName);
 
             return token;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while signing in the user.");
+            logger.Error(ex, "An error occurred while signing in the user.");
             throw new Exception(ex.Message);
         }
     }
 
     public async Task<string> SignUpAsync(NetworkCredential credentials, SignUpDTO createUser)
     {
-        logger.LogInformation("Creating new user...");
+        logger.Information("Creating new user...");
         try
         {
             var user = new User
@@ -89,14 +89,14 @@ public class UserService(
             var encodeEmailToken = Encoding.UTF8.GetBytes(confirmEmailToken);
             var validEmailToken = WebEncoders.Base64UrlEncode(encodeEmailToken);
 
-            logger.LogInformation("User {UserName} created successfully!", credentials.UserName);
+            logger.Information("User {UserName} created successfully!", credentials.UserName);
 
             InsertTokenIntoCookies(user.Id, token);
             return validEmailToken;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while creating a new user: {UserName}",
+            logger.Error(ex, "An error occurred while creating a new user: {UserName}",
                 credentials.UserName);
             throw new Exception(ex.Message);
         }
