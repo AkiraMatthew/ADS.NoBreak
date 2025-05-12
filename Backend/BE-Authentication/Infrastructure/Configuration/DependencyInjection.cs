@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Domain.Interfaces.Services;
+using Services.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Configuration;
@@ -20,6 +22,8 @@ public static class DependencyInjection
 
     public static void AddServicesDependencyInjection(IServiceCollection services)
     {
-
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IClaimsService, ClaimsService>();
     }
 }

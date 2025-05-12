@@ -1,8 +1,11 @@
 using Infrastructure.Configuration;
+using Login.Infra.CrossCutting.IoC.Configuration;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var apiVersion = builder.Configuration.GetValue<string>("ApiVersion");
+var isLoggingEnabled = builder.Configuration.GetValue<bool>("LoggingEnabled", false);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -47,6 +50,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 #endregion
 
+if (isLoggingEnabled)
+    builder.Host.UseSerilog((context, config) => LoggingConfig.ConfigureSerilog(context, config));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -61,9 +67,10 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseHttpsRedirection();
-//app.RunMigrations();
+app.RunMigrations();
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapControllers();
 app.UseRouting();
+if (isLoggingEnabled) LoggingConfig.AddLoggingMiddleware(app);
 app.Run();

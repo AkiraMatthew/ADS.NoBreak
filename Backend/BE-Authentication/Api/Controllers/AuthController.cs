@@ -1,12 +1,15 @@
 ﻿using Domain.DTO;
+using Domain.Interfaces.Services;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Services.Services;
 using System.Net;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController: ControllerBase
+public class AuthController(IUserService userService): ControllerBase
 {
     /// <summary>
     /// Registers a new user
@@ -22,9 +25,20 @@ public class AuthController: ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SignUpAsync([FromBody] SignUpDTO signUpRequest)
     {
-        var credential = new NetworkCredential(signUpRequest.Email.ToLower(), signUpRequest.Password);
+        try
+        {
+            var credentials = new NetworkCredential(signUpRequest.Email.ToLower(), signUpRequest.Password);
+            var isTokenCreated = await userService.SignUpAsync(credentials, signUpRequest);
 
-        return Ok();
+            if(string.IsNullOrEmpty(isTokenCreated))
+                return BadRequest("User already exists!");
+
+            return Ok();
+        }
+        catch (Exception ex) 
+        {
+            return BadRequest($"User could not be created, details: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -41,6 +55,20 @@ public class AuthController: ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SignInAsync([FromBody] SignInDTO signInRequest)
     {
-        return Ok();
+        try
+        {
+            var credentials = new NetworkCredential(signInRequest.Email, signInRequest.Password);
+
+            var token = await userService.SignInAsync(credentials);
+
+            if (token is null)
+                return BadRequest();
+
+            return Ok(token);
+        }
+        catch (Exception ex) 
+        {
+            return BadRequest($"User authentication failed, details: {ex.Message}");
+        }
     }
 }
